@@ -46,6 +46,28 @@ def search():
 
     return result
 
+@route('/searchId', method='GET')
+def searchId():
+    datas = []
+    keyword = request.query.keyword
+    print(keyword)
+    datas = query_db("/opt/api/info.db", 'select * from human where id = ?',(str(keyword),))
+
+    result = {'datas': []}
+    result_title = result['datas']
+
+    for d in datas:
+        result_title.append({
+            "id": d.get('id'),
+            "name": d.get('name'),
+            "part": d.get('part'),
+            "position": d.get('position'),
+            "mail": d.get('mail'),
+            "etc": d.get('etc')
+        })
+
+    return result
+
 # @route('/upload', method='POST')
 # def upload():
 #     upload = request.files.query('upload')
@@ -58,6 +80,17 @@ def search():
 #     inputfile.write(upload.file.read())
 #     inputfile.close()
 #     return 'OK'
+
+@route('/upload2', method='POST')
+def do_upload2():
+    upload   = request.files.get('upload')
+    name, ext = os.path.splitext(upload.filename)
+
+    #file check
+    if ext not in ('.jpeg'):
+        return template("index",msg="The file extension is not allowed.")
+
+    upload.save("/tmp",overwrite=True)
 
 #File Upload
 @get('/upload')
@@ -126,5 +159,5 @@ def query_db(db_path, query, args=(), one=False):
     return (r[0] if r else None) if one else r
 
 if __name__ == "__main__":
-  # daemon_run(host='0.0.0.0', port=99)
-  run(host='0.0.0.0', port=99)  
+  daemon_run(host='0.0.0.0', port=99)
+  # run(host='0.0.0.0', port=99)  
