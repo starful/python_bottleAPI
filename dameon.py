@@ -68,6 +68,30 @@ def searchId():
 
     return result
 
+@route('/comment', method='GET')
+def searchComment():
+    datas = []
+    keyword = request.query.keyword
+    print(keyword)
+    datas = query_db("/opt/api/info.db", 'select * from human as a, human_comment as b where a.id = b.human_id and a.id = ?',(keyword,))
+
+    result = {'datas': []}
+    result_comment = result['datas']
+
+    for d in datas:
+        print(d.get('text'))
+        result_comment.append({
+            "id": d.get('id'),
+            "name": d.get('name'),
+            "part": d.get('part'),
+            "position": d.get('position'),
+            "mail": d.get('mail'),
+            "etc": d.get('etc'),
+            "text": d.get('text'),
+            "reg_time": d.get('reg_time')
+        })
+
+    return result
 # @route('/upload', method='POST')
 # def upload():
 #     upload = request.files.query('upload')
