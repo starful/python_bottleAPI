@@ -74,12 +74,12 @@ def searchComment():
     keyword = request.query.keyword
     print(keyword)
     datas = query_db("/opt/api/info.db", 'select * from human as a, human_comment as b where a.id = b.human_id and a.id = ?',(keyword,))
+    datas_avg = query_db("/opt/api/info.db", 'select AVG(c.eva_a)as eva_a, AVG(c.eva_b)as eva_b, AVG(c.eva_c)as eva_c, AVG(c.eva_d)as eva_d, AVG(c.eva_e)as eva_e from human as a, human_evaluation as c where a.id = c.human_id  and a.id = ?',(keyword,))
 
-    result = {'datas': []}
+    result = {'datas': [], 'datas_avg':[]}
+
     result_comment = result['datas']
-
     for d in datas:
-        print(d.get('text'))
         result_comment.append({
             "id": d.get('id'),
             "name": d.get('name'),
@@ -89,6 +89,16 @@ def searchComment():
             "etc": d.get('etc'),
             "text": d.get('text'),
             "reg_time": d.get('reg_time')
+        })
+
+    result_eva_avg = result['datas_avg']
+    for d in datas_avg:
+        result_eva_avg.append({
+            "eva_a": d.get('eva_a'),
+            "eva_b": d.get('eva_b'),
+            "eva_c": d.get('eva_c'),
+            "eva_d": d.get('eva_d'),
+            "eva_e": d.get('eva_e')
         })
 
     return result
