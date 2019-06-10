@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from bottledaemon import daemon_run
 from bottle import route, run 
 import sqlite3
@@ -29,7 +30,7 @@ def search():
     datas = []
     keyword = request.query.keyword
     print(keyword)
-    datas = query_db("/opt/api/info.db", 'select * from human where name LIKE ?',('%{}%'.format(str(keyword)),))
+    datas = query_db("/Users/s-han/git/bottle_API/bottle/info.db", 'select * from human where name LIKE ?',('%{}%'.format(str(keyword)),))
 
     result = {'datas': []}
     result_title = result['datas']
@@ -51,7 +52,7 @@ def searchId():
     datas = []
     keyword = request.query.keyword
     print(keyword)
-    datas = query_db("/opt/api/info.db", 'select * from human where id = ?',(str(keyword),))
+    datas = query_db("/Users/s-han/git/bottle_API/bottle/info.db", 'select * from human where id = ?',(str(keyword),))
 
     result = {'datas': []}
     result_title = result['datas']
@@ -73,8 +74,8 @@ def searchComment():
     datas = []
     keyword = request.query.keyword
     print(keyword)
-    datas = query_db("/opt/api/info.db", 'select * from human as a, human_comment as b where a.id = b.human_id and a.id = ?',(keyword,))
-    datas_avg = query_db("/opt/api/info.db", 'select AVG(c.eva_a)as eva_a, AVG(c.eva_b)as eva_b, AVG(c.eva_c)as eva_c, AVG(c.eva_d)as eva_d, AVG(c.eva_e)as eva_e from human as a, human_evaluation as c where a.id = c.human_id  and a.id = ?',(keyword,))
+    datas = query_db("/Users/s-han/git/bottle_API/bottle/info.db", 'select * from human as a, human_comment as b where a.id = b.human_id and a.id = ?',(keyword,))
+    datas_avg = query_db("/Users/s-han/git/bottle_API/bottle/info.db", 'select AVG(c.eva_a)as eva_a, AVG(c.eva_b)as eva_b, AVG(c.eva_c)as eva_c, AVG(c.eva_d)as eva_d, AVG(c.eva_e)as eva_e from human as a, human_evaluation as c where a.id = c.human_id  and a.id = ?',(keyword,))
 
     result = {'datas': [], 'datas_avg':[]}
 
@@ -121,7 +122,7 @@ def do_upload2():
     name, ext = os.path.splitext(upload.filename)
 
     #file check
-    if ext not in ('.jpeg'):
+    if ext not in ('.jpg'):
         return template("index",msg="The file extension is not allowed.")
 
     upload.save("/tmp",overwrite=True)
@@ -150,7 +151,7 @@ def do_upload():
     if ext not in ('.png', '.jpg', '.jpeg'):
         return 'File extension not allowed.'
     # save_path = get_save_path()
-    upload.save("/opt/img/")
+    upload.save("/Users/s-han/git/bottle_API/bottle/")
     return 'Upload OK. FilePath: %s%s' % ("/opt/img/", upload.filename)
 
 @route('/email', method='GET')
@@ -180,6 +181,33 @@ def email_send():
     except Exception as e:
         print(str(e))
 
+@route('/checklogin')
+def a_book():
+    datas = []
+    db_path = "todo.db"
+    datas = query_db(db_path, 'select users,passwd from users')
+    search = filter(lambda datas: datas['users'] == request.query.id and datas['passwd'] == request.query.pw, datas)
+
+    obj = next(search, None)
+    # https://bottlepy.org/docs/dev/tutorial.html#generating-content
+    # returnする値が辞書（もしくはそのサブタイプ）場合、Bottoleが自動的にレスポンスヘッダにapplication/jsonを付けてくれる！
+    if obj is not None:
+        return { 'result' : True }
+    else:
+        response.status = 404 
+        return { 'result' : False }
+
+@route("/searchAll")
+def search():
+    print("ser")
+    datas = []
+    db_path = "todo.db"
+    datas = query_db(db_path, 'select * from users')
+
+    result = {"datas": datas}
+
+    return result
+
 def query_db(db_path, query, args=(), one=False):
     try:
         conn = sqlite3.connect(db_path)
@@ -191,6 +219,7 @@ def query_db(db_path, query, args=(), one=False):
     except sqlite3.Error as e:
         print('query_db : sqlite3.Error occurred:' + str(e.args[0]))
     return (r[0] if r else None) if one else r
+
 
 if __name__ == "__main__":
   daemon_run(host='0.0.0.0', port=99)
