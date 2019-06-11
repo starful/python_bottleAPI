@@ -30,7 +30,7 @@ def search():
     datas = []
     keyword = request.query.keyword
     print(keyword)
-    datas = query_db("/Users/s-han/git/bottle_API/bottle/info.db", 'select * from human where name LIKE ?',('%{}%'.format(str(keyword)),))
+    datas = query_db("/opt/api/info.db", 'select * from human where name LIKE ?',('%{}%'.format(str(keyword)),))
 
     result = {'datas': []}
     result_title = result['datas']
@@ -52,7 +52,7 @@ def searchId():
     datas = []
     keyword = request.query.keyword
     print(keyword)
-    datas = query_db("/Users/s-han/git/bottle_API/bottle/info.db", 'select * from human where id = ?',(str(keyword),))
+    datas = query_db("/opt/api/info.db", 'select * from human where id = ?',(str(keyword),))
 
     result = {'datas': []}
     result_title = result['datas']
@@ -74,8 +74,8 @@ def searchComment():
     datas = []
     keyword = request.query.keyword
     print(keyword)
-    datas = query_db("/Users/s-han/git/bottle_API/bottle/info.db", 'select * from human as a, human_comment as b where a.id = b.human_id and a.id = ?',(keyword,))
-    datas_avg = query_db("/Users/s-han/git/bottle_API/bottle/info.db", 'select AVG(c.eva_a)as eva_a, AVG(c.eva_b)as eva_b, AVG(c.eva_c)as eva_c, AVG(c.eva_d)as eva_d, AVG(c.eva_e)as eva_e from human as a, human_evaluation as c where a.id = c.human_id  and a.id = ?',(keyword,))
+    datas = query_db("/opt/api/info.db", 'select * from human as a, human_comment as b where a.id = b.human_id and a.id = ?',(keyword,))
+    datas_avg = query_db("/opt/api/info.db", 'select AVG(c.eva_a)as eva_a, AVG(c.eva_b)as eva_b, AVG(c.eva_c)as eva_c, AVG(c.eva_d)as eva_d, AVG(c.eva_e)as eva_e from human as a, human_evaluation as c where a.id = c.human_id  and a.id = ?',(keyword,))
 
     result = {'datas': [], 'datas_avg':[]}
 
@@ -151,7 +151,7 @@ def do_upload():
     if ext not in ('.png', '.jpg', '.jpeg'):
         return 'File extension not allowed.'
     # save_path = get_save_path()
-    upload.save("/Users/s-han/git/bottle_API/bottle/")
+    upload.save("/opt/api/bottle/")
     return 'Upload OK. FilePath: %s%s' % ("/opt/img/", upload.filename)
 
 @route('/email', method='GET')
